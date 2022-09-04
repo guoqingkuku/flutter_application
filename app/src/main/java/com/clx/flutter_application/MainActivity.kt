@@ -1,7 +1,6 @@
 package com.clx.flutter_application
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -12,17 +11,17 @@ import android.view.MenuItem
 import com.clx.flutter_application.databinding.ActivityMainBinding
 import com.clx.flutter_application.flutter.FlutterEngineManager
 import io.flutter.embedding.android.FlutterActivity
-import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    private var mChannel: MethodChannel? = null
+
 
     companion object {
-        const val CHANNEL = "com.clx.flutter_application"
+        const val channel_name = "com.clx.flutter_application"
         const val engine_id = "engine_id"
+        const val method_name = "textMethod"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,13 +39,11 @@ class MainActivity : AppCompatActivity() {
 
         val list = arrayListOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
 
-        val flutterEngine = FlutterEngineManager.flutterEngine(engine_id, list)
-        val messenger = flutterEngine?.dartExecutor?.binaryMessenger
-        mChannel = MethodChannel(messenger!!, CHANNEL)
+        FlutterEngineManager.createFlutterEngine(engine_id, list)
 
 
         binding.fab.setOnClickListener {
-            mChannel?.invokeMethod("textMethod", null)
+            FlutterEngineManager.invokeMethod(engine_id, channel_name, method_name,"+++++++++算求+++++++++")
             startActivity(
                 FlutterActivity
                     .withCachedEngine(engine_id)
@@ -75,5 +72,12 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        FlutterEngineManager.destroyEngine(engine_id)
+
     }
 }
