@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import com.clx.flutter_application.databinding.ActivityMainBinding
 import com.clx.flutter_application.flutter.FlutterEngineManager
+import com.clx.flutter_application.flutter.SingleFlutterActivity
 import io.flutter.embedding.android.FlutterActivity
 
 class MainActivity : AppCompatActivity() {
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         binding.fab.setOnClickListener {
             FlutterEngineManager.invokeMethod(engine_id, channel_name, method_name,"+++++++++算求+++++++++")
             startActivity(
-                FlutterActivity
+                SingleFlutterActivity
                     .withCachedEngine(engine_id)
                     .build(this)
             )

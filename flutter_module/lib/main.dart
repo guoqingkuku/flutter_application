@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_module/native_channel_to_android.dart';
 
 void main(List<String> args) {
   WidgetsFlutterBinding.ensureInitialized();
@@ -98,13 +99,11 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
+            TextButton(
+                onPressed: () {
+                  NativeChannelToAndroid.finish();
+                },
+                child: const Text('关闭flutter页面')),
           ],
         ),
       ),
@@ -119,7 +118,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
 //初始化通道
 void initChannel() {
-  const MethodChannel('com.clx.flutter_application').setMethodCallHandler((call) {
+  const MethodChannel('com.clx.flutter_application')
+      .setMethodCallHandler((call) {
     debugPrint("channel: ${call.method}");
     if (call.method == "textMethod") {
       debugPrint("textMethod: ${call.arguments}");
@@ -127,4 +127,3 @@ void initChannel() {
     return Future.value(null);
   });
 }
-
