@@ -6,6 +6,22 @@ plugins {
 android {
     compileSdk 32
 
+
+    //读取properties文件
+    def properties = new Properties()
+    properties.load(project.rootProject.file('keys.properties').newDataInputStream())
+
+    //获取project task
+    def flutterArrDebug = task('flutterArrDebug', type: Exec) {
+        workingDir '../flutter_module'
+        commandLine 'flutter', 'build', 'aar', '--no-profile', '--no-release'
+    }
+    def flutterArrRelease = task('flutterArrRelease', type: Exec) {
+        workingDir '../flutter_module'
+        commandLine 'flutter', 'build', 'aar', '--no-profile', '--no-debug'
+    }
+
+
     defaultConfig {
         applicationId "com.clx.flutter_application"
         minSdk 24
@@ -16,10 +32,28 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
+    signingConfigs {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            keyAlias 'android'
+            keyPassword properties['keyPassword']
+            storeFile file(properties['storeFile'])
+            storePassword properties['storePassword']
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        debug {
+            debuggable false
+            zipAlignEnabled true
+            signingConfig signingConfigs.release
+            preBuild.dependsOn flutterArrDebug
+        }
+        release {
+            debuggable false
+            zipAlignEnabled true
+            signingConfig signingConfigs.release
+            preBuild.dependsOn flutterArrRelease
         }
     }
     compileOptions {
@@ -32,6 +66,23 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    flavorDimensions "env"
+
+    productFlavors {
+        dev {
+            dimension "env"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+        }
+        prod {
+            dimension "env"
+            applicationIdSuffix ".prod"
+            versionNameSuffix "-prod"
+        }
+    }
+
+
 }
 
 dependencies {
